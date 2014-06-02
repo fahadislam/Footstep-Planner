@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/fahad/catkin_ws/src/stacks/humanoid_navigation/footstep_planner/build/devel/setup.sh
