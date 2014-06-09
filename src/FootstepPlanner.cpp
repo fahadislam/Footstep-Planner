@@ -289,7 +289,7 @@ FootstepPlanner::setPlanner()
   }
   else if (ivPlannerType == "MPlanner")    //fahad
   {
-    ivPlannerPtr.reset(new MPlanner(ivPlannerEnvironmentPtr.get(), 1, ivEnvironmentParams.forward_search));
+    ivPlannerPtr.reset(new MPlanner(ivPlannerEnvironmentPtr.get(), 3, ivEnvironmentParams.forward_search));
   }
 
   else if (ivPlannerType == "RSTARPlanner")
@@ -348,8 +348,16 @@ FootstepPlanner::run()
     ROS_ERROR("Failed to set goal state\n");
     return false;
   }
+  //fahad
+  if (ivPlannerType == "MPlanner")
+    ivPlannerPtr->force_planning_from_scratch();
 
-  ivPlannerPtr->set_initialsolution_eps(ivInitialEpsilon);
+  if (ivPlannerType == "MPlanner")
+  {ivPlannerPtr->set_initialsolution_eps1(ivInitialEpsilon);
+    ivPlannerPtr->set_initialsolution_eps2(2);}
+  else
+    ivPlannerPtr->set_initialsolution_eps(ivInitialEpsilon);
+ // 
   ivPlannerPtr->set_search_mode(ivSearchUntilFirstSolution);
 
   ROS_INFO("Start planning (max time: %f, initial eps: %f (%f))\n",
@@ -663,16 +671,10 @@ FootstepPlanner::mapCallback(
     const nav_msgs::OccupancyGridConstPtr& occupancy_map)
 {
   GridMap2DPtr map(new GridMap2D(occupancy_map));
-  GridMap2DPtr map2(new GridMap2D(occupancy_map));
+  // GridMap2DPtr map2(new GridMap2D(occupancy_map));
 
   // new map: update the map information
-  if (updateMap(map, 1))  //fahad
-  {
-    // NOTE: update map currently simply resets the planner, i.e. replanning
-    // here is in fact a planning from the scratch
-    plan(false);
-  }
-  if (updateMap(map2, 2))  //fahad
+  if (updateMap(map))  
   {
     // NOTE: update map currently simply resets the planner, i.e. replanning
     // here is in fact a planning from the scratch
@@ -693,6 +695,11 @@ FootstepPlanner::setGoal(const geometry_msgs::PoseStampedConstPtr goal_pose)
 bool
 FootstepPlanner::setGoal(float x, float y, float theta)
 {
+  //fahad
+  x = 3.158547;
+  y = 3.598363;
+  theta = 0.995252;
+
   if (!ivMapPtr)
   {
     ROS_ERROR("Distance map hasn't been initialized yet.");
@@ -767,6 +774,12 @@ FootstepPlanner::setStart(const State& left_foot, const State& right_foot)
 bool
 FootstepPlanner::setStart(float x, float y, float theta)
 {
+  //fahad
+
+  x = 2.603076;
+  y = 2.838186;
+  theta = 0.945101;
+
   if (!ivMapPtr)
   {
     ROS_ERROR("Distance map hasn't been initialized yet.");
@@ -798,9 +811,11 @@ FootstepPlanner::setStart(float x, float y, float theta)
 
 
 bool
-FootstepPlanner::updateMap(const GridMap2DPtr map, int i)
+FootstepPlanner::updateMap(const GridMap2DPtr map)
 {
   // store old map pointer locally
+
+ 
   GridMap2DPtr old_map = ivMapPtr;
   // store new map
   ivMapPtr.reset();
@@ -814,7 +829,7 @@ FootstepPlanner::updateMap(const GridMap2DPtr map, int i)
   }
 
   // ..otherwise the environment's map can simply be updated
-  ivPlannerEnvironmentPtr->updateMap(map, i);
+  ivPlannerEnvironmentPtr->updateMap(map);
   return false;
 }
 
@@ -828,7 +843,7 @@ FootstepPlanner::updateEnvironment(const GridMap2DPtr old_map)
   // set the new map
 
   printf("problem\n");
-  ivPlannerEnvironmentPtr->updateMap(ivMapPtr, 0);  //fahad
+  ivPlannerEnvironmentPtr->updateMap(ivMapPtr);  //fahad
 
 
   // The following is not used any more

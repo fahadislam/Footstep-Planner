@@ -142,7 +142,7 @@ public:
    * @return True if a replanning is necessary, i.e. the old path is not valid
    * any more.
    */
-  bool updateMap(const gridmap_2d::GridMap2DPtr map, int i);  //fahad
+  bool updateMap(const gridmap_2d::GridMap2DPtr map); 
 
   void setMarkerNamespace(const std::string& ns)
   {
@@ -268,7 +268,7 @@ protected:
   void updateEnvironment(const gridmap_2d::GridMap2DPtr old_map);
 
   boost::shared_ptr<FootstepPlannerEnvironment> ivPlannerEnvironmentPtr;
-  gridmap_2d::GridMap2DPtr ivMapPtr, ivMapPtr2;   //fahad
+  gridmap_2d::GridMap2DPtr ivMapPtr;   
   boost::shared_ptr<SBPLPlanner> ivPlannerPtr;
 
   boost::shared_ptr<const PathCostHeuristic> ivPathCostHeuristicPtr;

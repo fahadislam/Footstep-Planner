@@ -316,17 +316,17 @@ FootstepPlannerEnvironment::getState(unsigned int id, State* s)
 
 
 void
-FootstepPlannerEnvironment::updateMap(gridmap_2d::GridMap2DPtr map, int i)
+FootstepPlannerEnvironment::updateMap(gridmap_2d::GridMap2DPtr map) 
 {
-  ivMapPtr.reset();
-  ivMapPtr = map;
+    ivMapPtr.reset();
+    ivMapPtr = map;
 
   if (ivHeuristicConstPtr->getHeuristicType() == Heuristic::PATH_COST)
   {
     boost::shared_ptr<PathCostHeuristic> h =
         boost::dynamic_pointer_cast<PathCostHeuristic>(
             ivHeuristicConstPtr);
-    h->updateMap(map, i);
+    h->updateMap(map);
 
     ivHeuristicExpired = true;
   }
@@ -597,7 +597,7 @@ FootstepPlannerEnvironment::getSuccsOfGridCells(
 
 int
 FootstepPlannerEnvironment::GetFromToHeuristic(int FromStateID,
-                                               int ToStateID)  //fahad
+                                               int ToStateID)  
 {
   assert(FromStateID >= 0 && (unsigned int) FromStateID < ivStateId2State.size());
   assert(ToStateID >= 0 && (unsigned int) ToStateID < ivStateId2State.size());
@@ -613,15 +613,60 @@ FootstepPlannerEnvironment::GetFromToHeuristic(int FromStateID,
   //    		boost::shared_ptr<PathCostHeuristic> pathCostHeuristic = boost::dynamic_pointer_cast<PathCostHeuristic>(ivHeuristicConstPtr);
   //    		pathCostHeuristic->calculateDistances(*from, *to);
   //    	}
-  return GetFromToHeuristic(*from, *to); //fahad
+  return GetFromToHeuristic(*from, *to); 
+}
+
+int
+FootstepPlannerEnvironment::GetFromToHeuristic(int FromStateID,
+                                               int ToStateID, int i)  //fahad
+{
+  assert(FromStateID >= 0 && (unsigned int) FromStateID < ivStateId2State.size());
+  assert(ToStateID >= 0 && (unsigned int) ToStateID < ivStateId2State.size());
+
+  if ((FromStateID == ivIdGoalFootLeft && ToStateID == ivIdGoalFootRight)
+      || (FromStateID == ivIdGoalFootRight && ToStateID == ivIdGoalFootLeft)){
+    return 0;
+  }
+
+  const PlanningState* from = ivStateId2State[FromStateID];
+  const PlanningState* to = ivStateId2State[ToStateID];
+  //      if (ivHeuristicConstPtr->getHeuristicType() == Heuristic::PATH_COST){
+  //        boost::shared_ptr<PathCostHeuristic> pathCostHeuristic = boost::dynamic_pointer_cast<PathCostHeuristic>(ivHeuristicConstPtr);
+  //        pathCostHeuristic->calculateDistances(*from, *to);
+  //      }
+  return GetFromToHeuristic(*from, *to, i); //fahad
 }
 
 int
 FootstepPlannerEnvironment::GetFromToHeuristic(const PlanningState& from,
-                                               const PlanningState& to)  //fahad
+                                               const PlanningState& to) 
 {
+  // pathcost
+  // // printf("Heuristic %f\n", cvMmScale * ivHeuristicScale * ivHeuristicConstPtr->getHValue(from, to));
+  // return cvMmScale * ivHeuristicScale *
+  //   ivHeuristicConstPtr->getHValue(from, to); 
+
+  //euclidean 
+    boost::shared_ptr<Heuristic> h_anchor;
+  h_anchor.reset(
+        new EuclideanHeuristic(.01,
+                               64));
   return cvMmScale * ivHeuristicScale *
-    ivHeuristicConstPtr->getHValue(from, to);  //fahad
+    h_anchor->getHValue(from, to);  //fahad
+ }
+
+int
+FootstepPlannerEnvironment::GetFromToHeuristic(const PlanningState& from,
+                                               const PlanningState& to, int i)  //fahad
+{
+    // return cvMmScale * ivHeuristicScale *
+    // ivHeuristicConstPtr->getHValue(from, to); 
+      boost::shared_ptr<PathCostHeuristic> h =
+        boost::dynamic_pointer_cast<PathCostHeuristic>(
+            ivHeuristicConstPtr);
+      // printf("Heuristic %f\n", cvMmScale * ivHeuristicScale * h->getHValue(from, to,i));
+  return cvMmScale * ivHeuristicScale *
+    h->getHValue(from, to, i);  //fahad
 }
 
 
@@ -630,6 +675,9 @@ FootstepPlannerEnvironment::GetGoalHeuristic(int stateID)
 {
   return GetFromToHeuristic(stateID, ivIdGoalFootLeft);
 }
+
+//fahad
+
 
 
 void
@@ -727,11 +775,11 @@ FootstepPlannerEnvironment::GetStartHeuristic(int stateID)
 }
 
 //fahad
-// int
-// FootstepPlannerEnvironment::GetStartHeuristic(int stateID, int i)
-// {
-//   return GetFromToHeuristic(stateID, ivIdStartFootLeft, i);
-// }
+int
+FootstepPlannerEnvironment::GetStartHeuristic(int stateID, int i)
+{
+  return GetFromToHeuristic(stateID, ivIdStartFootLeft, i);
+}
 
 void
 FootstepPlannerEnvironment::GetSuccs(int SourceStateID,

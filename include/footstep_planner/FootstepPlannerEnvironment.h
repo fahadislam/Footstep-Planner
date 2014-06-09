@@ -142,7 +142,7 @@ public:
   std::pair<int, int> updateStart(const State& foot_left,
                                   const State& right_right);
 
-  void updateMap(gridmap_2d::GridMap2DPtr map, int i);  //fahad
+  void updateMap(gridmap_2d::GridMap2DPtr map); 
 
   /**
    * @return True iff the foot in State s is colliding with an
@@ -191,7 +191,7 @@ public:
    * planning state ToStateID from within planning state FromStateID.
    */
   int GetFromToHeuristic(int FromStateID, int ToStateID);
-  // int GetFromToHeuristic(int FromStateID, int ToStateID, int i); //fahad
+  int GetFromToHeuristic(int FromStateID, int ToStateID, int i); //fahad
 
   /**
    * @return The heuristic value to reach the goal from within the
@@ -204,7 +204,7 @@ public:
    * the planning state stateID. (Used for backward planning.)
    */
   int GetStartHeuristic(int stateID);
-  // int GetStartHeuristic(int stateID, int i); //fahad
+  int GetStartHeuristic(int stateID, int i); //fahad
 
   /**
    * @brief Calculates the successor states and the corresponding costs
@@ -291,7 +291,7 @@ protected:
    * planning state ToStateID from within planning state FromStateID.
    */
   int GetFromToHeuristic(const PlanningState& from, const PlanningState& to);
-  // int GetFromToHeuristic(const PlanningState& from, const PlanningState& to, int i); //fahad
+  int GetFromToHeuristic(const PlanningState& from, const PlanningState& to, int i); //fahad
 
   /// @return The step cost for reaching 'b' from within 'a'.
   int  stepCost(const PlanningState& a, const PlanningState& b);
@@ -455,7 +455,6 @@ protected:
 
   /// Pointer to the map.
   boost::shared_ptr<gridmap_2d::GridMap2D> ivMapPtr; 
-  boost::shared_ptr<gridmap_2d::GridMap2D> ivMapPtr2; //fahad
 
   exp_states_2d_t ivExpandedStates;
   exp_states_t ivRandomStates;  ///< random intermediate states for R*

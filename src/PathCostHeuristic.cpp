@@ -53,9 +53,7 @@ PathCostHeuristic::getHValue(const PlanningState& current,
                              const PlanningState& to)
 const
 {
-  // if (i==0)
-  {
-    assert(ivGoalX >= 0 && ivGoalY >= 0);
+  assert(ivGoalX >= 0 && ivGoalY >= 0);
 
   if (current == to)
     return 0.0;
@@ -99,59 +97,117 @@ const
         angle_cell_2_state(diff_angle_disc, ivNumAngleBins)));
   }
 
+  // printf("Heuristic dist %f steps %f angle %f\n", dist, expected_steps * ivStepCost, diff_angle * ivDiffAngleCost);
+  // printf("%d\n", );
   return (dist + expected_steps * ivStepCost + diff_angle * ivDiffAngleCost);
 }
-// else  //fahad
-// {
-//      assert(ivGoalX >= 0 && ivGoalY >= 0);
 
-//   if (current == to)
-//     return 0.0;
+//fahad
+double
+PathCostHeuristic::getHValue(const PlanningState& current,
+                             const PlanningState& to, int i)
+const
+{
+  if (i==1)
+  {
+  assert(ivGoalX >= 0 && ivGoalY >= 0);
 
-//   unsigned int from_x;
-//   unsigned int from_y;
-//   // could be removed after more testing (then use ...noBounds... again)
-//   ivMapPtr2->worldToMapNoBounds(cell_2_state(current.getX(), ivCellSize),
-//                                cell_2_state(current.getY(), ivCellSize),
-//                                from_x, from_y);
+  if (current == to)
+    return 0.0;
 
-//   unsigned int to_x;
-//   unsigned int to_y;
-//   // could be removed after more testing (then use ...noBounds... again)
-//   ivMapPtr2->worldToMapNoBounds(cell_2_state(to.getX(), ivCellSize),
-//                                cell_2_state(to.getY(), ivCellSize),
-//                                to_x, to_y);
+  unsigned int from_x;
+  unsigned int from_y;
+  // could be removed after more testing (then use ...noBounds... again)
+  ivMapPtr->worldToMapNoBounds(cell_2_state(current.getX(), ivCellSize),
+                               cell_2_state(current.getY(), ivCellSize),
+                               from_x, from_y);
 
-//   // cast to unsigned int is safe since ivGoalX/ivGoalY are checked to be >= 0
-//   if ((unsigned int)ivGoalX != to_x || (unsigned int)ivGoalY != to_y)
-//   {
-//     ROS_ERROR("PathCostHeuristic::getHValue to a different value than "
-//               "precomputed, heuristic values will be wrong. You need to call "
-//               "calculateDistances() before!");
-//   }
-//   assert((unsigned int)ivGoalX == to_x && (unsigned int)ivGoalY == to_y);
+  unsigned int to_x;
+  unsigned int to_y;
+  // could be removed after more testing (then use ...noBounds... again)
+  ivMapPtr->worldToMapNoBounds(cell_2_state(to.getX(), ivCellSize),
+                               cell_2_state(to.getY(), ivCellSize),
+                               to_x, to_y);
 
-//   double dist = double(ivGridSearchPtr2->getlowerboundoncostfromstart_inmm(
-//       from_x, from_y)) / 1000.0;
+  // cast to unsigned int is safe since ivGoalX/ivGoalY are checked to be >= 0
+  if ((unsigned int)ivGoalX != to_x || (unsigned int)ivGoalY != to_y)
+  {
+    ROS_ERROR("PathCostHeuristic::getHValue to a different value than "
+              "precomputed, heuristic values will be wrong. You need to call "
+              "calculateDistances() before!");
+  }
+  assert((unsigned int)ivGoalX == to_x && (unsigned int)ivGoalY == to_y);
 
-//   double expected_steps = dist / ivMaxStepWidth;
-//   double diff_angle = 0.0;
-//   if (ivDiffAngleCost > 0.0)
-//   {
-//     // get the number of bins between from.theta and to.theta
-//     int diff_angle_disc = (
-//         ((to.getTheta() - current.getTheta()) % ivNumAngleBins) +
-//         ivNumAngleBins) % ivNumAngleBins;
-//     // get the rotation independent from the rotation direction
-//     diff_angle = std::abs(angles::normalize_angle(
-//         angle_cell_2_state(diff_angle_disc, ivNumAngleBins)));
-//   }
+  double dist = double(ivGridSearchPtr->getlowerboundoncostfromstart_inmm(
+      from_x, from_y)) / 1000.0;
 
-//   return (dist + expected_steps * ivStepCost + diff_angle * ivDiffAngleCost);
+  double expected_steps = dist / ivMaxStepWidth;
+  double diff_angle = 0.0;
+  if (ivDiffAngleCost > 0.0)
+  {
+    // get the number of bins between from.theta and to.theta
+    int diff_angle_disc = (
+        ((to.getTheta() - current.getTheta()) % ivNumAngleBins) +
+        ivNumAngleBins) % ivNumAngleBins;
+    // get the rotation independent from the rotation direction
+    diff_angle = std::abs(angles::normalize_angle(
+        angle_cell_2_state(diff_angle_disc, ivNumAngleBins)));
+  }
 
-// }
+  // printf("Heuristic dist %f steps %f angle %f\n", dist, expected_steps * ivStepCost, diff_angle * ivDiffAngleCost);
+  // printf("%d\n", );
+  return (dist + expected_steps * ivStepCost + diff_angle * ivDiffAngleCost);
 }
 
+  assert(ivGoalX >= 0 && ivGoalY >= 0);
+
+  if (current == to)
+    return 0.0;
+
+  unsigned int from_x;
+  unsigned int from_y;
+  // could be removed after more testing (then use ...noBounds... again)
+  ivMapPtr->worldToMapNoBounds(cell_2_state(current.getX(), ivCellSize),
+                               cell_2_state(current.getY(), ivCellSize),
+                               from_x, from_y);
+
+  unsigned int to_x;
+  unsigned int to_y;
+  // could be removed after more testing (then use ...noBounds... again)
+  ivMapPtr->worldToMapNoBounds(cell_2_state(to.getX(), ivCellSize),
+                               cell_2_state(to.getY(), ivCellSize),
+                               to_x, to_y);
+
+  // cast to unsigned int is safe since ivGoalX/ivGoalY are checked to be >= 0
+  if ((unsigned int)ivGoalX != to_x || (unsigned int)ivGoalY != to_y)
+  {
+    ROS_ERROR("PathCostHeuristic::getHValue to a different value than "
+              "precomputed, heuristic values will be wrong. You need to call "
+              "calculateDistances() before!");
+  }
+  assert((unsigned int)ivGoalX == to_x && (unsigned int)ivGoalY == to_y);
+
+  double dist = double(ivGridSearchPtr2->getlowerboundoncostfromstart_inmm(
+      from_x, from_y)) / 1000.0;
+
+  // printf("dist %d\n", dist);
+
+  double expected_steps = dist / ivMaxStepWidth;
+  double diff_angle = 0.0;
+  if (ivDiffAngleCost > 0.0)
+  {
+    // get the number of bins between from.theta and to.theta
+    int diff_angle_disc = (
+        ((to.getTheta() - current.getTheta()) % ivNumAngleBins) +
+        ivNumAngleBins) % ivNumAngleBins;
+    // get the rotation independent from the rotation direction
+    diff_angle = std::abs(angles::normalize_angle(
+        angle_cell_2_state(diff_angle_disc, ivNumAngleBins)));
+  }
+
+// printf("Heuristic dist %f steps %f angle %f\n", dist, expected_steps * ivStepCost, diff_angle * ivDiffAngleCost);
+  return (dist + expected_steps * ivStepCost + diff_angle * ivDiffAngleCost);
+}
 
 bool
 PathCostHeuristic::calculateDistances(const PlanningState& from,
@@ -178,35 +234,21 @@ PathCostHeuristic::calculateDistances(const PlanningState& from,
     ivGridSearchPtr->search(ivpGrid, cvObstacleThreshold,
                             ivGoalX, ivGoalY, from_x, from_y,
                             SBPL_2DGRIDSEARCH_TERM_CONDITION_ALLCELLS);
-  }
-
-//fahad     for map2
-  assert(ivMapPtr2);
-
-  ivMapPtr2->worldToMapNoBounds(cell_2_state(from.getX(), ivCellSize),
-                               cell_2_state(from.getY(), ivCellSize),
-                               from_x, from_y);
-
-  ivMapPtr2->worldToMapNoBounds(cell_2_state(to.getX(), ivCellSize),
-                               cell_2_state(to.getY(), ivCellSize),
-                               to_x, to_y);
-
-  if ((int)to_x != ivGoalX || (int)to_y != ivGoalY)
-  {
-    ivGoalX = to_x;
-    ivGoalY = to_y;
-    ivGridSearchPtr->search(ivpGrid2, cvObstacleThreshold,
+    ivGridSearchPtr2->search(ivpGrid2, cvObstacleThreshold,
                             ivGoalX, ivGoalY, from_x, from_y,
                             SBPL_2DGRIDSEARCH_TERM_CONDITION_ALLCELLS);
   }
+
   return true;
 }
 
 
 void
-PathCostHeuristic::updateMap(gridmap_2d::GridMap2DPtr map, int i)
+PathCostHeuristic::updateMap(gridmap_2d::GridMap2DPtr map)
 {
-  if (i==1){
+  // if (i==2) //fahad 
+  //   ivInflationRadius*=1.2;
+
   ivMapPtr.reset();
   ivMapPtr = map;
  
@@ -238,18 +280,14 @@ PathCostHeuristic::updateMap(gridmap_2d::GridMap2DPtr map, int i)
         ivpGrid[x][y] = 0;
     } 
   }
-}
-  ///////////////////////////////////////fahad map2
-else{
-  ivMapPtr2.reset();
-  ivMapPtr2 = map;
-  ivGoalX = ivGoalY = -1;
-  unsigned width = ivMapPtr2->getInfo().width;
-  unsigned height = ivMapPtr2->getInfo().height;
+
+//map 2 fahad
+
   if (ivGridSearchPtr2)
     ivGridSearchPtr2->destroy();
   ivGridSearchPtr2.reset(new SBPL2DGridSearch(width, height,
-                                             ivMapPtr2->getResolution()));
+                                             ivMapPtr->getResolution()));
+    // ivGridSearchPtr2 = ivGridSearchPtr;
   if (ivpGrid2)
     resetGrid2();
   ivpGrid2 = new unsigned char* [width];
@@ -260,16 +298,15 @@ else{
   {
     for (unsigned x = 0; x < width; ++x)
     {
-      float dist = ivMapPtr2->distanceMapAtCell(x,y);
-      if (dist < 0.0f)
+      float dist2 = ivMapPtr->distanceMapAtCell(x,y);
+      if (dist2 < 0.0f)
         ROS_ERROR("Distance map at %d %d out of bounds", x, y);
-      else if (dist <= ivInflationRadius)
+      else if (dist2 <= 0.09)    //fahad outercircle
         ivpGrid2[x][y] = 255;
       else
         ivpGrid2[x][y] = 0;
     } 
   }
-}
 }
 
 
@@ -291,7 +328,7 @@ PathCostHeuristic::resetGrid()
 void
 PathCostHeuristic::resetGrid2()   //fahad
 {
-  CvSize size = ivMapPtr2->size();
+  CvSize size = ivMapPtr->size();
   for (int x = 0; x < size.width; ++x)
   {
     if (ivpGrid2[x])

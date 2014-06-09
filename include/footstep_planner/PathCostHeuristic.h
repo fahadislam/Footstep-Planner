@@ -55,7 +55,9 @@ public:
    * current state.
    */
   virtual double getHValue(const PlanningState& current,
-                           const PlanningState& to) const;  //fahad
+                           const PlanningState& to) const;  
+  virtual double getHValue(const PlanningState& current,
+                           const PlanningState& to, int i) const;  //fahad
   /**
    * @brief Calculates for each grid cell of the map a 2D path to the
    * cell (to.x, to.y).
@@ -64,7 +66,7 @@ public:
    */
   bool calculateDistances(const PlanningState& from, const PlanningState& to);
 
-  void updateMap(gridmap_2d::GridMap2DPtr map, int i);  //fahad
+  void updateMap(gridmap_2d::GridMap2DPtr map);  //fahad
 
 private:
   static const int cvObstacleThreshold = 200;
@@ -79,7 +81,7 @@ private:
   int ivGoalX;
   int ivGoalY;
 
-  gridmap_2d::GridMap2DPtr ivMapPtr, ivMapPtr2;   //fahad
+  gridmap_2d::GridMap2DPtr ivMapPtr;  
   boost::shared_ptr<SBPL2DGridSearch> ivGridSearchPtr;
   boost::shared_ptr<SBPL2DGridSearch> ivGridSearchPtr2;   //fahad
 

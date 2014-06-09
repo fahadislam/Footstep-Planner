@@ -492,7 +492,7 @@ FootstepNavigation::mapCallback(
   ivIdMapFrame = map->getFrameID();
 
   // updates the map and starts replanning if necessary
-  if (ivPlanner.updateMap(map, 0))  //fahad
+  if (ivPlanner.updateMap(map)) 
   {
     replan();
   }

@@ -235,6 +235,9 @@ PROJECTCONFIG:FILEPATH=PROJECTCONFIG-NOTFOUND
 //Path to a program.
 PYTHON_EXECUTABLE:FILEPATH=/usr/bin/python
 
+//Specify specific Python version to use ('major.minor' or 'major')
+PYTHON_VERSION:STRING=
+
 //Python version
 PYTHON_VERSION_XDOTY:STRING=2.7
 

@@ -78,7 +78,7 @@ public:
     enlargedWallMap->setMap(binaryMap);
 
     printf("problem\n");
-    ivFootstepPlanner.updateMap(enlargedWallMap, 0);
+    ivFootstepPlanner.updateMap(enlargedWallMap);
   }
 
 protected:
