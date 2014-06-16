@@ -643,16 +643,16 @@ FootstepPlannerEnvironment::GetFromToHeuristic(const PlanningState& from,
 {
   // pathcost
   // // printf("Heuristic %f\n", cvMmScale * ivHeuristicScale * ivHeuristicConstPtr->getHValue(from, to));
-  // return cvMmScale * ivHeuristicScale *
-  //   ivHeuristicConstPtr->getHValue(from, to); 
-
-  //euclidean 
-    boost::shared_ptr<Heuristic> h_anchor;
-  h_anchor.reset(
-        new EuclideanHeuristic(.01,
-                               64));
   return cvMmScale * ivHeuristicScale *
-    h_anchor->getHValue(from, to);  //fahad
+    ivHeuristicConstPtr->getHValue(from, to); 
+
+  // euclidean 
+  //   boost::shared_ptr<Heuristic> h_anchor;
+  // h_anchor.reset(
+  //       new EuclideanHeuristic(.01,
+  //                              64));
+  // return cvMmScale * ivHeuristicScale *
+  //   h_anchor->getHValue(from, to);  //fahad
  }
 
 int

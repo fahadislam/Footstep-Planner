@@ -32,6 +32,7 @@ PathCostHeuristic::PathCostHeuristic(double cell_size,
 : Heuristic(cell_size, num_angle_bins, PATH_COST),
   ivpGrid(NULL),
   ivpGrid2(NULL),   //fahad
+  ivpGrid3(NULL),   //fahad
   ivStepCost(step_cost),
   ivDiffAngleCost(diff_angle_cost),
   ivMaxStepWidth(max_step_width),
@@ -51,7 +52,7 @@ PathCostHeuristic::~PathCostHeuristic()
 double
 PathCostHeuristic::getHValue(const PlanningState& current,
                              const PlanningState& to)
-const
+const   //incircle
 {
   assert(ivGoalX >= 0 && ivGoalY >= 0);
 
@@ -138,7 +139,7 @@ const
   }
   assert((unsigned int)ivGoalX == to_x && (unsigned int)ivGoalY == to_y);
 
-  double dist = double(ivGridSearchPtr->getlowerboundoncostfromstart_inmm(
+  double dist = double(ivGridSearchPtr3->getlowerboundoncostfromstart_inmm(
       from_x, from_y)) / 1000.0;
 
   double expected_steps = dist / ivMaxStepWidth;
@@ -237,6 +238,9 @@ PathCostHeuristic::calculateDistances(const PlanningState& from,
     ivGridSearchPtr2->search(ivpGrid2, cvObstacleThreshold,
                             ivGoalX, ivGoalY, from_x, from_y,
                             SBPL_2DGRIDSEARCH_TERM_CONDITION_ALLCELLS);
+    ivGridSearchPtr3->search(ivpGrid3, cvObstacleThreshold,
+                            ivGoalX, ivGoalY, from_x, from_y,
+                            SBPL_2DGRIDSEARCH_TERM_CONDITION_ALLCELLS);
   }
 
   return true;
@@ -246,66 +250,110 @@ PathCostHeuristic::calculateDistances(const PlanningState& from,
 void
 PathCostHeuristic::updateMap(gridmap_2d::GridMap2DPtr map)
 {
-  // if (i==2) //fahad 
+ // if (i==2) //fahad 
   //   ivInflationRadius*=1.2;
+  static int called = 0;
 
-  ivMapPtr.reset();
-  ivMapPtr = map;
- 
-  ivGoalX = ivGoalY = -1;
-
-  unsigned width = ivMapPtr->getInfo().width;
-  unsigned height = ivMapPtr->getInfo().height;
-
-  if (ivGridSearchPtr)
-    ivGridSearchPtr->destroy();
-  ivGridSearchPtr.reset(new SBPL2DGridSearch(width, height,
-                                             ivMapPtr->getResolution()));
-  if (ivpGrid)
-    resetGrid();
-  ivpGrid = new unsigned char* [width];
-
-  for (unsigned x = 0; x < width; ++x)
-    ivpGrid[x] = new unsigned char [height];
-  for (unsigned y = 0; y < height; ++y)
+  if (called == 0)      //incircle admissible
   {
+    // printf("1111111111111111111111111111111111111111111111111\n");
+    ivMapPtr.reset();
+    ivMapPtr = map;
+   
+    ivGoalX = ivGoalY = -1;
+
+    unsigned width = ivMapPtr->getInfo().width;
+    unsigned height = ivMapPtr->getInfo().height;
+
+    if (ivGridSearchPtr)
+      ivGridSearchPtr->destroy();
+    ivGridSearchPtr.reset(new SBPL2DGridSearch(width, height,
+                                               ivMapPtr->getResolution()));
+    if (ivpGrid)
+      resetGrid();
+    ivpGrid = new unsigned char* [width];
+
     for (unsigned x = 0; x < width; ++x)
+      ivpGrid[x] = new unsigned char [height];
+    for (unsigned y = 0; y < height; ++y)
     {
-      float dist = ivMapPtr->distanceMapAtCell(x,y);
-      if (dist < 0.0f)
-        ROS_ERROR("Distance map at %d %d out of bounds", x, y);
-      else if (dist <= ivInflationRadius)
-        ivpGrid[x][y] = 255;
-      else
-        ivpGrid[x][y] = 0;
-    } 
+      for (unsigned x = 0; x < width; ++x)
+      {
+        float dist = ivMapPtr->distanceMapAtCell(x,y);
+        if (dist < 0.0f)
+          ROS_ERROR("Distance map at %d %d out of bounds", x, y);
+        else if (dist <= ivInflationRadius)
+          ivpGrid[x][y] = 255;
+        else
+          ivpGrid[x][y] = 0;
+      } 
+    }
+    /////////////
+    if (ivGridSearchPtr3)   //circumcircle in admissible
+      ivGridSearchPtr3->destroy();
+    ivGridSearchPtr3.reset(new SBPL2DGridSearch(width, height,
+                                               ivMapPtr->getResolution()));
+      // ivGridSearchPtr2 = ivGridSearchPtr;
+    if (ivpGrid3)
+      resetGrid2();
+    ivpGrid3 = new unsigned char* [width];
+
+    for (unsigned x = 0; x < width; ++x)
+      ivpGrid3[x] = new unsigned char [height];
+    for (unsigned y = 0; y < height; ++y)
+    {
+      for (unsigned x = 0; x < width; ++x)
+      {
+        float dist2 = ivMapPtr->distanceMapAtCell(x,y);
+        if (dist2 < 0.0f)
+          ROS_ERROR("Distance map at %d %d out of bounds", x, y);
+        else if (dist2 <= 0.09)    //fahad outercircle
+          ivpGrid3[x][y] = 255;
+        else
+          ivpGrid3[x][y] = 0;
+      } 
+    }
+
+    called = 1;
+    return;
   }
 
 //map 2 fahad
-
-  if (ivGridSearchPtr2)
-    ivGridSearchPtr2->destroy();
-  ivGridSearchPtr2.reset(new SBPL2DGridSearch(width, height,
-                                             ivMapPtr->getResolution()));
-    // ivGridSearchPtr2 = ivGridSearchPtr;
-  if (ivpGrid2)
-    resetGrid2();
-  ivpGrid2 = new unsigned char* [width];
-
-  for (unsigned x = 0; x < width; ++x)
-    ivpGrid2[x] = new unsigned char [height];
-  for (unsigned y = 0; y < height; ++y)
+  if (called == 1)      //for planning
   {
+    // printf("22222222222222222222222222222222222222222222\n");
+       ivMapPtr.reset();
+    ivMapPtr = map;
+   
+    ivGoalX = ivGoalY = -1;
+
+    unsigned width = ivMapPtr->getInfo().width;
+    unsigned height = ivMapPtr->getInfo().height;
+
+    if (ivGridSearchPtr2)
+      ivGridSearchPtr2->destroy();
+    ivGridSearchPtr2.reset(new SBPL2DGridSearch(width, height,
+                                               ivMapPtr->getResolution()));
+      // ivGridSearchPtr2 = ivGridSearchPtr;
+    if (ivpGrid2)
+      resetGrid2();
+    ivpGrid2 = new unsigned char* [width];
+
     for (unsigned x = 0; x < width; ++x)
+      ivpGrid2[x] = new unsigned char [height];
+    for (unsigned y = 0; y < height; ++y)
     {
-      float dist2 = ivMapPtr->distanceMapAtCell(x,y);
-      if (dist2 < 0.0f)
-        ROS_ERROR("Distance map at %d %d out of bounds", x, y);
-      else if (dist2 <= 0.09)    //fahad outercircle
-        ivpGrid2[x][y] = 255;
-      else
-        ivpGrid2[x][y] = 0;
-    } 
+      for (unsigned x = 0; x < width; ++x)
+      {
+        float dist2 = ivMapPtr->distanceMapAtCell(x,y);
+        if (dist2 < 0.0f)
+          ROS_ERROR("Distance map at %d %d out of bounds", x, y);
+        else if (dist2 <= ivInflationRadius)    //fahad outercircle
+          ivpGrid2[x][y] = 255;
+        else
+          ivpGrid2[x][y] = 0;
+      } 
+    }
   }
 }
 
@@ -339,5 +387,21 @@ PathCostHeuristic::resetGrid2()   //fahad
   }
   delete[] ivpGrid2;
   ivpGrid2 = NULL;
+}
+
+void
+PathCostHeuristic::resetGrid3()   //fahad
+{
+  CvSize size = ivMapPtr->size();
+  for (int x = 0; x < size.width; ++x)
+  {
+    if (ivpGrid3[x])
+    {
+      delete[] ivpGrid3[x];
+      ivpGrid3[x] = NULL;
+    }
+  }
+  delete[] ivpGrid3;
+  ivpGrid3 = NULL;
 }
 } // end of namespace

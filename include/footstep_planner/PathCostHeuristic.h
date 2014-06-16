@@ -73,6 +73,7 @@ private:
 
   unsigned char** ivpGrid; 
   unsigned char** ivpGrid2; //fahad
+  unsigned char** ivpGrid3; //fahad
   double ivStepCost;
   double ivDiffAngleCost;
   double ivMaxStepWidth;
@@ -84,9 +85,11 @@ private:
   gridmap_2d::GridMap2DPtr ivMapPtr;  
   boost::shared_ptr<SBPL2DGridSearch> ivGridSearchPtr;
   boost::shared_ptr<SBPL2DGridSearch> ivGridSearchPtr2;   //fahad
+  boost::shared_ptr<SBPL2DGridSearch> ivGridSearchPtr3;   //fahad
 
   void resetGrid();
   void resetGrid2();    //fahad
+  void resetGrid3();    //fahad
 };
 }
 #endif  // FOOTSTEP_PLANNER_PATHCOSTHEURISTIC_H_

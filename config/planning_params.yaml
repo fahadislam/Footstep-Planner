@@ -22,7 +22,7 @@ planner_type: MPlanner
 search_until_first_solution: True
 
 # the maximum search time if search_until_first_solution is set to False
-allocated_time: 7.0
+allocated_time: 50.0
 
 initial_epsilon: 5.0
 

@@ -661,7 +661,7 @@ FootstepPlanner::startPoseCallback(
     {
       // force planning from scratch when forward direction
       plan(ivEnvironmentParams.forward_search);
-    }
+    } 
   }
 }
 
@@ -695,11 +695,15 @@ FootstepPlanner::setGoal(const geometry_msgs::PoseStampedConstPtr goal_pose)
 bool
 FootstepPlanner::setGoal(float x, float y, float theta)
 {
-  //fahad
-  x = 3.158547;
-  y = 3.598363;
-  theta = 0.995252;
+ //5.614932 0.733276 1.249044
 
+  //aaa
+  
+  
+x = 1.539920; y = 4.919264; theta = 1.460137;
+
+
+ 
   if (!ivMapPtr)
   {
     ROS_ERROR("Distance map hasn't been initialized yet.");
@@ -722,6 +726,7 @@ FootstepPlanner::setGoal(float x, float y, float theta)
 
   ivGoalPoseSetUp = true;
   ROS_INFO("Goal pose set to (%f %f %f)", x, y, theta);
+  printf("\nx = %f; y = %f; theta = %f;\n", x, y, theta);
 
   return true;
 }
@@ -775,11 +780,11 @@ bool
 FootstepPlanner::setStart(float x, float y, float theta)
 {
   //fahad
-
-  x = 2.603076;
-  y = 2.838186;
-  theta = 0.945101;
-
+  //2.792080 3.320670 0.674741
+  //bbb
+  
+x = 5.642174; y = 4.916518; theta = -0.927293;
+  
   if (!ivMapPtr)
   {
     ROS_ERROR("Distance map hasn't been initialized yet.");
@@ -792,7 +797,8 @@ FootstepPlanner::setStart(float x, float y, float theta)
 
   bool success = setStart(foot_left, foot_right);
   if (success)
-    ROS_INFO("Start pose set to (%f %f %f)", x, y, theta);
+   { ROS_INFO("Start pose set to (%f %f %f)", x, y, theta);
+       printf("\nx = %f; y = %f; theta = %f;\n", x, y, theta);}
   else
     ROS_ERROR("Start pose (%f %f %f) not accessible.", x, y, theta);
 

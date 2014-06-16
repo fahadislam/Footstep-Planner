@@ -73,12 +73,19 @@ public:
 
     GridMap2DPtr enlargedWallMap(new GridMap2D(occupancyMap));
     cv::Mat binaryMap =  (enlargedWallMap->distanceMap() > ivFootstepWallDist);
+
+    wallMap->setMap(binaryMap);
+
     bitwise_and(binaryMap, ivGridMap->binaryMap(), binaryMap);
 
     enlargedWallMap->setMap(binaryMap);
 
     printf("problem\n");
+
+    ivFootstepPlanner.updateMap(wallMap);
     ivFootstepPlanner.updateMap(enlargedWallMap);
+
+    
   }
 
 protected:
@@ -94,6 +101,10 @@ protected:
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "footstep_planner");
+log4cxx::LoggerPtr my_logger =	//fahad
+           log4cxx::Logger::getLogger(ROSCONSOLE_DEFAULT_NAME);
+my_logger->setLevel(
+           ros::console::g_level_lookup[ros::console::levels::Debug]);
 
   FootstepPlannerWallsNode planner;
 

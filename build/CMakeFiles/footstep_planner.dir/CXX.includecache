@@ -126,10 +126,6 @@ footstep_planner/FootstepPlanner.h
 humanoid_nav_msgs/ClipFootstep.h
 -
 
-/home/fahad/catkin_ws/src/stacks/humanoid_navigation/footstep_planner/src/PathCostHeuristic.cpp
-footstep_planner/PathCostHeuristic.h
--
-
 /home/fahad/catkin_ws/src/stacks/humanoid_navigation/gridmap_2d/include/gridmap_2d/GridMap2D.h
 opencv2/core/core.hpp
 -
